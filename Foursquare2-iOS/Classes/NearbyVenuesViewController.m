@@ -57,6 +57,51 @@
         // This is iOS 7 case.
         [self.locationManager startUpdatingLocation];
     }
+    //CLLocation *location = [[CLLocation alloc] initWithLatitude:55 longitude:-11.5];
+    //[self getVenuesForLocation:location];
+
+                            [Foursquare2
+                                venueSearchNearByLatitude:@(40.75)
+                                longitude:@(-111.8833)
+                                query:@"burger"
+                                limit:@3
+                                intent:intentCheckin
+                                radius:@(10000)
+                                categoryId:nil
+                                callback:^(BOOL success, id result){
+                                    if (success) {
+                                        NSDictionary *dic = result;
+                                        NSArray *venues = [dic valueForKeyPath:@"response.venues"];
+                                        FSConverter *converter = [[FSConverter alloc] init];
+                                        self.nearbyVenues = [converter convertToObjects:venues];
+                                        [self.tableView reloadData];
+                                        NSLog(@"query success: dic=%@", dic);
+                                    } else {
+                                        NSLog(@"%@",result);
+                                    }
+                                }];
+    
+        [Foursquare2 venueSearchNearByLatitude:@(40.75)
+                                 longitude:@(111.88)
+                                     query:@"pizza"
+                                     limit:nil
+                                    intent:intentCheckin
+                                    radius:@(500)
+                                categoryId:nil
+                                  callback:^(BOOL success, id result){
+                                      if (success) {
+                                          NSDictionary *dic = result;
+                                          NSArray *venues = [dic valueForKeyPath:@"response.venues"];
+                                          FSConverter *converter = [[FSConverter alloc]init];
+                                          self.nearbyVenues = [converter convertToObjects:venues];
+                                          [self.tableView reloadData];
+                                          [self proccessAnnotations];
+                                          NSLog(@"query success: dic=%@", dic);
+                                          
+                                        } else {
+                                            NSLog(@"query failed");
+                                        }
+                                  }];
 }
 
 - (void)alertView:(UIAlertView *)alertView willDismissWithButtonIndex:(NSInteger)buttonIndex {
@@ -136,7 +181,7 @@
     didUpdateToLocation:(CLLocation *)newLocation
            fromLocation:(CLLocation *)oldLocation {
     [self.locationManager stopUpdatingLocation];
-    [self getVenuesForLocation:newLocation];
+    //[self getVenuesForLocation:newLocation];
     [self setupMapForLocatoion:newLocation];
 }
 
